@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: chat-service-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`your-domain.com`) && PathPrefix(`/chat-socket.io/`)
+      kind: Rule
+      services:
+        - name: chat-service-service
+          port: 80
+      middlewares:
+        - name: websocket-headers 

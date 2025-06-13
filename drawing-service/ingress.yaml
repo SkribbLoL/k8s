@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: drawing-service-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`your-domain.com`) && PathPrefix(`/drawing-socket.io/`)
+      kind: Rule
+      services:
+        - name: drawing-service-service
+          port: 80
+      middlewares:
+        - name: websocket-headers 

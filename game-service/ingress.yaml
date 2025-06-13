@@ -1,0 +1,25 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: game-service-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`your-domain.com`) && PathPrefix(`/socket.io/`)
+      kind: Rule
+      services:
+        - name: game-service-service
+          port: 80
+      middlewares:
+        - name: websocket-headers
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: websocket-headers
+spec:
+  headers:
+    customRequestHeaders:
+      Connection: "Upgrade"
+      Upgrade: "websocket" 

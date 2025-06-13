@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: game-service-service
+  name: drawing-service-service
 spec:
   selector:
-    app: game-service
+    app: drawing-service
   ports:
   - name: http
     port: 80
-    targetPort: 5000
+    targetPort: 5001

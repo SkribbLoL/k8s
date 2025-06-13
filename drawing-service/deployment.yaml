@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drawing-service-deployment
+  labels:
+    app: drawing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drawing-service
+  template:
+    metadata:
+      labels:
+        app: drawing-service
+    spec:
+      containers:
+      - name: drawing-service
+        image: veljkoskrbic/skribblol-drawing-service:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 5001
+        env:
+        - name: REDIS_HOST
+          value: "redis-master.default.svc.cluster.local"
+
+        - name: REDIS_PORT
+          value: "6379"
+
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis
+              key: redis-password
