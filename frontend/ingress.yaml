@@ -6,8 +6,8 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: PathPrefix(`/`)
+    - match: Host(`your-domain.com`) && PathPrefix(`/`)
       kind: Rule
       services:
         - name: frontend-service
-          port: 8080 
+          port: 80 
