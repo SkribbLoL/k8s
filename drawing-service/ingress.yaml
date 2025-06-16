@@ -6,10 +6,8 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`your-domain.com`) && PathPrefix(`/drawing-socket.io/`)
+    - match: PathPrefix(`/drawing`)
       kind: Rule
       services:
         - name: drawing-service-service
           port: 80
-      middlewares:
-        - name: websocket-headers 

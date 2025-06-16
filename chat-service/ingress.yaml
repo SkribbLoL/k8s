@@ -6,10 +6,20 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`your-domain.com`) && PathPrefix(`/chat-socket.io/`)
+    - match: PathPrefix(`/chat`)
       kind: Rule
       services:
         - name: chat-service-service
           port: 80
       middlewares:
-        - name: websocket-headers 
+        - name: strip-chat-prefix
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-chat-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /chat

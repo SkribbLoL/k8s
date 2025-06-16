@@ -6,25 +6,20 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`your-domain.com`) && PathPrefix(`/socket.io/`)
+    - match: PathPrefix(`/game`)
       kind: Rule
       services:
         - name: game-service-service
           port: 80
       middlewares:
-        - name: websocket-headers
-    - match: Host(`your-domain.com`) && PathPrefix(`/rooms`)
-      kind: Rule
-      services:
-        - name: game-service-service
-          port: 80
+        - name: strip-game-prefix
+
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: websocket-headers
+  name: strip-game-prefix
 spec:
-  headers:
-    customRequestHeaders:
-      Connection: "Upgrade"
-      Upgrade: "websocket" 
+  stripPrefix:
+    prefixes:
+      - /game
