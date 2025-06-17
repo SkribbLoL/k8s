@@ -13,21 +13,39 @@ spec:
         - name: game-service-service
           port: 80
       middlewares:
-        - name: game-headers
-    # General game routes - less specific, comes after
+        - name: game-websocket-headers
+    # Health check route (without stripping prefix)
+    - match: Path(`/game/health`)
+      kind: Rule
+      services:
+        - name: game-service-service
+          port: 80
+      middlewares:
+        - name: game-api-headers
+    # REST API routes - with stripPrefix for other routes
+    - match: PathPrefix(`/game/rooms`)
+      kind: Rule
+      services:
+        - name: game-service-service
+          port: 80
+      middlewares:
+        - name: strip-game-prefix
+        - name: game-api-headers
+    # Catch-all for other /game routes (if needed)
     - match: PathPrefix(`/game`)
       kind: Rule
       services:
         - name: game-service-service
           port: 80
       middlewares:
-        - name: game-headers
+        - name: strip-game-prefix
+        - name: game-api-headers
 ---
-# Middleware to handle WebSocket upgrade headers
+# Middleware for WebSocket connections (no stripPrefix)
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: game-headers
+  name: game-websocket-headers
 spec:
   headers:
     customRequestHeaders:
@@ -39,3 +57,27 @@ spec:
       # Add headers for long polling
       Cache-Control: "no-cache"
       Connection: "keep-alive"
+---
+# Middleware for REST API calls (with CORS)
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: game-api-headers
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "http"
+    customResponseHeaders:
+      Access-Control-Allow-Origin: "*"
+      Access-Control-Allow-Methods: "GET,POST,PUT,DELETE,OPTIONS"
+      Access-Control-Allow-Headers: "Content-Type,Authorization"
+---
+# Strip prefix middleware for REST API routes
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-game-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /game

@@ -6,7 +6,7 @@ spec:
   entryPoints:
     - web
   routes:
-    # Socket.IO specific routes - must come first (more specific)
+    # Socket.IO specific routes for drawing WebSocket connections
     - match: PathPrefix(`/drawing/socket.io/`)
       kind: Rule
       services:
@@ -14,8 +14,8 @@ spec:
           port: 80
       middlewares:
         - name: drawing-headers
-    # General drawing routes - less specific, comes after
-    - match: PathPrefix(`/drawing`)
+    # Health check endpoint
+    - match: Path(`/drawing/health`)
       kind: Rule
       services:
         - name: drawing-service-service
