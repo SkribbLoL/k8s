@@ -6,20 +6,36 @@ spec:
   entryPoints:
     - web
   routes:
+    # Socket.IO specific routes - must come first (more specific)
+    - match: PathPrefix(`/chat/socket.io/`)
+      kind: Rule
+      services:
+        - name: chat-service-service
+          port: 80
+      middlewares:
+        - name: chat-headers
+    # General chat routes - less specific, comes after
     - match: PathPrefix(`/chat`)
       kind: Rule
       services:
         - name: chat-service-service
           port: 80
       middlewares:
-        - name: strip-chat-prefix
-
+        - name: chat-headers
 ---
+# Middleware to handle WebSocket upgrade headers
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-chat-prefix
+  name: chat-headers
 spec:
-  stripPrefix:
-    prefixes:
-      - /chat
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "http"
+    customResponseHeaders:
+      Access-Control-Allow-Origin: "*"
+      Access-Control-Allow-Methods: "GET,POST,OPTIONS"
+      Access-Control-Allow-Headers: "Content-Type"
+      # Add headers for long polling
+      Cache-Control: "no-cache"
+      Connection: "keep-alive"
