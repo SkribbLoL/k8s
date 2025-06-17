@@ -6,8 +6,36 @@ spec:
   entryPoints:
     - web
   routes:
+    # Socket.IO specific routes - must come first (more specific)
+    - match: PathPrefix(`/drawing/socket.io/`)
+      kind: Rule
+      services:
+        - name: drawing-service-service
+          port: 80
+      middlewares:
+        - name: drawing-headers
+    # General drawing routes - less specific, comes after
     - match: PathPrefix(`/drawing`)
       kind: Rule
       services:
         - name: drawing-service-service
           port: 80
+      middlewares:
+        - name: drawing-headers
+---
+# Middleware to handle WebSocket upgrade headers
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: drawing-headers
+spec:
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "http"
+    customResponseHeaders:
+      Access-Control-Allow-Origin: "*"
+      Access-Control-Allow-Methods: "GET,POST,OPTIONS"
+      Access-Control-Allow-Headers: "Content-Type"
+      # Add headers for long polling
+      Cache-Control: "no-cache"
+      Connection: "keep-alive"

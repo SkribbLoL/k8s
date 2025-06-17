@@ -6,20 +6,36 @@ spec:
   entryPoints:
     - web
   routes:
+    # Socket.IO specific routes - must come first (more specific)
+    - match: PathPrefix(`/game/socket.io/`)
+      kind: Rule
+      services:
+        - name: game-service-service
+          port: 80
+      middlewares:
+        - name: game-headers
+    # General game routes - less specific, comes after
     - match: PathPrefix(`/game`)
       kind: Rule
       services:
         - name: game-service-service
           port: 80
       middlewares:
-        - name: strip-game-prefix
-
+        - name: game-headers
 ---
+# Middleware to handle WebSocket upgrade headers
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: strip-game-prefix
+  name: game-headers
 spec:
-  stripPrefix:
-    prefixes:
-      - /game
+  headers:
+    customRequestHeaders:
+      X-Forwarded-Proto: "http"
+    customResponseHeaders:
+      Access-Control-Allow-Origin: "*"
+      Access-Control-Allow-Methods: "GET,POST,OPTIONS"
+      Access-Control-Allow-Headers: "Content-Type"
+      # Add headers for long polling
+      Cache-Control: "no-cache"
+      Connection: "keep-alive"
