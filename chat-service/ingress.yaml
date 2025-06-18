@@ -1,4 +1,4 @@
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: chat-service-ingress
@@ -24,7 +24,7 @@ spec:
         - name: chat-headers
 ---
 # Middleware to handle WebSocket upgrade headers
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: chat-headers

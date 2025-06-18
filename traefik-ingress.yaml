@@ -1,0 +1,34 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard-ingress
+  namespace: kube-system
+spec:
+  entryPoints:
+    - web
+  routes:
+    # Redirect root to dashboard with trailing slash
+    - match: Host(`traefik.veljkoskrbic.com`) && PathPrefix(`/`)
+      kind: Rule
+      middlewares:
+        - name: add-dashboard
+      services:
+        - name: api@internal
+          kind: TraefikService
+    # Handle dashboard and api paths
+    - match: Host(`traefik.veljkoskrbic.com`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+      kind: Rule
+      services:
+        - name: api@internal
+          kind: TraefikService
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: add-dashboard
+  namespace: kube-system
+spec:
+  redirectRegex:
+    regex: ^http://traefik\.veljkoskrbic\.com/?$
+    replacement: http://traefik.veljkoskrbic.com/dashboard/
+    permanent: false

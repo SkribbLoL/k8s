@@ -1,4 +1,4 @@
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: game-service-ingress
@@ -42,7 +42,7 @@ spec:
         - name: game-api-headers
 ---
 # Middleware for WebSocket connections (no stripPrefix)
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: game-websocket-headers
@@ -59,7 +59,7 @@ spec:
       Connection: "keep-alive"
 ---
 # Middleware for REST API calls (with CORS)
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: game-api-headers
@@ -73,7 +73,7 @@ spec:
       Access-Control-Allow-Headers: "Content-Type,Authorization"
 ---
 # Strip prefix middleware for REST API routes
-apiVersion: traefik.containo.us/v1alpha1
+apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
   name: strip-game-prefix

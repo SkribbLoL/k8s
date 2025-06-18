@@ -16,14 +16,17 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: veljkoskrbic/skribblol-frontend:latest
+        image: veljkoskrbic/skribblol-frontend:latest  # Placeholder
         imagePullPolicy: Always
         resources:
           requests:
             memory: "256Mi"
-            cpu: "500m"
+            cpu: "250m"
           limits:
-            memory: "512Mi"
-            cpu: "500m"
+            memory: "256Mi"
+            cpu: "250m"
         ports:
         - containerPort: 5173
+        env:
+        - name: VITE_API_URL
+          value: "http://veljkoskrbic.com"
